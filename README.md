@@ -54,8 +54,7 @@ Proper Shaders install.
 
 ## Trying it out
 
-1. Load a save and go anywhere — the light does not need you to be near it, but Grove
-   Street is where you will see it.
+1. Load a save and goto Grove Street; is where you will see it.
 2. Press **F7**. A message confirms the light was created.
 3. For the fog glow, the user config needs **Volumetric Fog** enabled; for the light
    to hit the ground at all, it needs the **Deferred Renderer**. See
@@ -100,13 +99,6 @@ Links between pages are written as ordinary relative links (`[Lights](Lights.md)
 they work both when browsing `wiki/` here and in the published wiki, where the action
 rewrites them.
 
-> **First-time setup.** The wiki has to exist before the workflow can push to it.
-> Enable *Settings → Features → Wikis*, then create any page once from the web UI —
-> the content does not matter, the first sync replaces it. Until that is done the job
-> fails, because there is no `.wiki.git` repository to clone. You can then run the
-> first sync by hand from the **Actions** tab.
-
 ---
 
-Built with the [Plugin-SDK](https://github.com/DK22Pac/plugin-sdk). The project files
-started from its `CreateCar` template.
+Built with the [Plugin-SDK](https://github.com/DK22Pac/plugin-sdk).
