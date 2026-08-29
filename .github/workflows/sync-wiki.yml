@@ -1,0 +1,57 @@
+name: Sync Wiki
+
+# Publishes the wiki/ folder to this repository's GitHub Wiki, so the wiki is
+# reviewed and versioned through pull requests like the rest of the repo rather
+# than edited in place.
+#
+# ONE-TIME SETUP: the wiki has to exist before this can push to it. Enable
+# Settings -> Features -> Wikis, then create any page once from the web UI (the
+# content does not matter - the first sync replaces it). Until that is done the
+# job fails, because there is no <repo>.wiki.git to clone.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'wiki/**'
+      - '.github/workflows/sync-wiki.yml'
+
+  # Lets you run a sync by hand from the Actions tab, which is handy for the
+  # first publish and after fixing the wiki settings above.
+  workflow_dispatch:
+
+# Never let two syncs push to the wiki at once.
+concurrency:
+  group: sync-wiki
+  cancel-in-progress: false
+
+jobs:
+  sync-to-wiki:
+    runs-on: ubuntu-latest
+
+    # Lets the automatic GITHUB_TOKEN write to the wiki repository.
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Publish wiki/ to the GitHub Wiki
+        uses: Andrew-Chen-Wang/github-wiki-action@v5
+        with:
+          # Folder holding the .md pages. One file per wiki page; Home.md is
+          # the landing page and _Sidebar.md renders beside every page.
+          path: wiki/
+
+          # 'clone' clones the existing wiki and commits on top, keeping its
+          # history. The alternative is 'init', which force-pushes a fresh
+          # repository and throws that history away.
+          strategy: clone
+
+          # Rewrites the .md links between pages into bare wiki links, so the
+          # same link works both here in the repo and in the published wiki.
+          preprocess: true
+
+          commit-message: 'Sync wiki from ${{ github.sha }}'

@@ -5,7 +5,7 @@ A minimal, complete Plugin-SDK mod that uses the Proper Shaders modding API.
 **Press F7 in game** to toggle a spot light in the middle of Grove Street. It points
 straight down and glows in the volumetric fog. Press it again to remove the light.
 
-The full API documentation is in [API.md](API.md).
+**Full API documentation: [the wiki](https://github.com/MixMods/ProperShadersApiExample/wiki).**
 
 ## What it demonstrates
 
@@ -22,7 +22,8 @@ example, not just a test.
 The API also has a second half this example does not touch: **state queries** — which
 features the user has enabled, which render pass is currently running, the shadow
 influence for the frame, and the deferred render targets themselves. See
-[State queries](API.md#state-queries) in the docs.
+[State Queries](https://github.com/MixMods/ProperShadersApiExample/wiki/State-Queries)
+in the wiki.
 
 ## Files
 
@@ -30,8 +31,8 @@ influence for the frame, and the deferred render targets themselves. See
 | --- | --- |
 | `Main.cpp` | The example itself. |
 | `ProperShadersAPI.h` | The API header, copied verbatim from Proper Shaders. **This is the only file you need to take into your own project.** |
-| `API.md` | Full API documentation. |
 | `ProperShadersApiExample.sln` / `.vcxproj` | Visual Studio project. |
+| `wiki/` | Source of the [documentation wiki](https://github.com/MixMods/ProperShadersApiExample/wiki). Edit here, not in the wiki UI — see [below](#editing-the-documentation). |
 
 ## Building
 
@@ -58,8 +59,8 @@ Proper Shaders install.
 2. Press **F7**. A message confirms the light was created.
 3. For the fog glow, the user config needs **Volumetric Fog** enabled; for the light
    to hit the ground at all, it needs the **Deferred Renderer**. See
-   [Requirements and fallbacks](API.md#requirements-and-fallbacks) in the docs if
-   nothing shows up.
+   [Requirements and Fallbacks](https://github.com/MixMods/ProperShadersApiExample/wiki/Requirements-and-Fallbacks)
+   if nothing shows up.
 
 ## Using it in your own mod
 
@@ -83,6 +84,27 @@ if (PS_ApiLoad(&ps)) {
 
 Call `PS_ApiLoad` **after** the game has loaded its mods, not from `DllMain` — see the
 comments on `EnsureApiLoaded()` in `Main.cpp`.
+
+## Editing the documentation
+
+The wiki is generated from the **`wiki/` folder in this repository**, so the docs are
+reviewed and versioned like the rest of the code. Do not edit pages in the GitHub wiki
+UI — the next sync overwrites them.
+
+Edit the `.md` files under `wiki/`, push to `main`, and the
+[Sync Wiki](.github/workflows/sync-wiki.yml) workflow publishes them. One file per
+page: `Home.md` is the landing page, `_Sidebar.md` is the navigation shown beside every
+page, and a file named `Some-Page.md` becomes the page *Some Page*.
+
+Links between pages are written as ordinary relative links (`[Lights](Lights.md)`) so
+they work both when browsing `wiki/` here and in the published wiki, where the action
+rewrites them.
+
+> **First-time setup.** The wiki has to exist before the workflow can push to it.
+> Enable *Settings → Features → Wikis*, then create any page once from the web UI —
+> the content does not matter, the first sync replaces it. Until that is done the job
+> fails, because there is no `.wiki.git` repository to clone. You can then run the
+> first sync by hand from the **Actions** tab.
 
 ---
 
