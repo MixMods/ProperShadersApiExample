@@ -1,5 +1,7 @@
 # Proper Shaders — Modding API
 
+**Note: Keep in mind that this documentation is written almost entirely by AI (because I hate writing wikis/documentation).**
+
 Proper Shaders exposes a C API so other mods (`.asi` / `.dll`) can work with its
 renderer. It currently covers two things:
 
