@@ -1,0 +1,90 @@
+# Proper Shaders API — example project
+
+A minimal, complete Plugin-SDK mod that uses the Proper Shaders modding API.
+
+**Press F7 in game** to toggle a spot light in the middle of Grove Street. It points
+straight down and glows in the volumetric fog. Press it again to remove the light.
+
+The full API documentation is in [API.md](API.md).
+
+## What it demonstrates
+
+- Loading the API at runtime, and **running harmlessly when Proper Shaders is not
+  installed** — the mod still loads, the light just never appears.
+- Creating a light with `PS_LightCreate` and keeping its handle.
+- Removing it again with `PS_LightDestroy`.
+- The per-light options that matter most: spot cone, colour and intensity, and
+  volumetric fog participation.
+
+`Main.cpp` is heavily commented and is meant to be read top to bottom — it is the
+example, not just a test.
+
+The API also has a second half this example does not touch: **state queries** — which
+features the user has enabled, which render pass is currently running, the shadow
+influence for the frame, and the deferred render targets themselves. See
+[State queries](API.md#state-queries) in the docs.
+
+## Files
+
+| File | |
+| --- | --- |
+| `Main.cpp` | The example itself. |
+| `ProperShadersAPI.h` | The API header, copied verbatim from Proper Shaders. **This is the only file you need to take into your own project.** |
+| `API.md` | Full API documentation. |
+| `ProperShadersApiExample.sln` / `.vcxproj` | Visual Studio project. |
+
+## Building
+
+You need the [Plugin-SDK](https://github.com/DK22Pac/plugin-sdk) and the
+`PLUGIN_SDK_DIR` environment variable pointing at it — the same setup any Plugin-SDK
+mod uses. If you also set `GTA_SA_DIR`, the post-build step copies the built `.asi`
+straight into your game's `scripts` folder.
+
+Open `ProperShadersApiExample.sln` and build the **Release / GTA-SA** configuration,
+or from a command line:
+
+```bash
+msbuild "ProperShadersApiExample.sln" -p:Configuration=Release -p:Platform=GTA-SA
+```
+
+The output is `bin\GTA-SA\Release\ProperShadersApiExample.SA.asi`. Drop it in your
+game's `scripts` folder (or anywhere an ASI loader picks it up) alongside a working
+Proper Shaders install.
+
+## Trying it out
+
+1. Load a save and go anywhere — the light does not need you to be near it, but Grove
+   Street is where you will see it.
+2. Press **F7**. A message confirms the light was created.
+3. For the fog glow, the user config needs **Volumetric Fog** enabled; for the light
+   to hit the ground at all, it needs the **Deferred Renderer**. See
+   [Requirements and fallbacks](API.md#requirements-and-fallbacks) in the docs if
+   nothing shows up.
+
+## Using it in your own mod
+
+Copy `ProperShadersAPI.h` into your project. That is the whole integration — there is
+nothing to link, and no build-time dependency on Proper Shaders:
+
+```cpp
+#include "ProperShadersAPI.h"
+
+PS_Api ps;
+if (PS_ApiLoad(&ps)) {
+    PS_LightDesc d;
+    PS_LightDescInit(&d);
+    d.position[0] = x; d.position[1] = y; d.position[2] = z;
+    d.radius = 12.0f;
+    d.intensity = 2.0f;
+
+    PS_LightHandle light = ps.LightCreate(&d);
+}
+```
+
+Call `PS_ApiLoad` **after** the game has loaded its mods, not from `DllMain` — see the
+comments on `EnsureApiLoaded()` in `Main.cpp`.
+
+---
+
+Built with the [Plugin-SDK](https://github.com/DK22Pac/plugin-sdk). The project files
+started from its `CreateCar` template.
