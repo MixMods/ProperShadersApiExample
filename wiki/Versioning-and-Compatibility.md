@@ -41,3 +41,4 @@ is ever backported.
 | --- | --- |
 | 1 | Lights. |
 | 2 | State queries: version and lifecycle, enabled features, current render pass, shadow influence, render targets. |
+| 3 | `PS_LIGHTFLAG_CAST_SHADOW`: a light can ask for a shadow. |

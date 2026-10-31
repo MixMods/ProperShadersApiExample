@@ -40,7 +40,7 @@ reload). Branch on them when deciding whether an effect of your own is worth doi
 | `int PS_IsUsingHDR(void)` | |
 | `int PS_IsUsingReversedDepthBuffer(void)` | Depth is reversed, so near = 1. Matters if you sample the depth buffer yourself. |
 | `int PS_IsUsingGlobalShadows(void)` | Directional (sun/moon) shadows specifically. |
-| `int PS_IsUsingAnyShadows(void)` | True if *any* shadow system is on: global shadows, skylight, or headlights. |
+| `int PS_IsUsingAnyShadows(void)` | True if *any* shadow system is on: global shadows, skylight, or local shadows. |
 
 Which pipeline replaced the game's own, per object class. **`0` always means the stock
 unlit PC pipeline** — i.e. Proper Shaders is not shading that class, and features like
@@ -62,7 +62,7 @@ shadows will not apply to it.
 | `int PS_IsRenderingScene(void)` | |
 | `int PS_IsRenderingPostFX(void)` | |
 | `int PS_IsCapturingGlobalShadows(void)` | Building the sun/moon shadow map. |
-| `int PS_IsCapturingLocalShadows(void)` | Building the headlight shadow map. |
+| `int PS_IsCapturingLocalShadows(void)` | Drawing the local shadow atlas. |
 | `int PS_IsCapturingSkylight(void)` | |
 | `int PS_IsCapturingReflections(void)` | Building the reflection capture. |
 | `int PS_IsCapturingDepth(void)` | |

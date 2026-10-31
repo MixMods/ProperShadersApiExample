@@ -52,7 +52,7 @@ extern "C" {
 // to find out what the INSTALLED ProperShaders supports; a runtime version
 // lower than the one you built against means the newer entry points are
 // missing and PS_ApiLoad() will have left them null.
-#define PS_API_VERSION 2
+#define PS_API_VERSION 3
 
 //-----------------------------------------------------------------------------
 // Types
@@ -130,7 +130,14 @@ enum PS_LightFlags
     // brighten lights in specific parts of the map). Set it for lights that
     // must keep exactly the intensity you asked for - a scripted cutscene
     // light, a flashlight the player carries.
-    PS_LIGHTFLAG_IGNORE_AREA_TWEAKS = 1u << 2
+    PS_LIGHTFLAG_IGNORE_AREA_TWEAKS = 1u << 2,
+
+    // Ask for a real shadow: what stands in the light blocks it. The nearest
+    // lights that ask get one, as many as the user gave room for, and a point
+    // light takes six times the room of a spot light, so ask only for lights
+    // that need it. Ignored unless the user has local shadows enabled.
+    // Requires API version 3.
+    PS_LIGHTFLAG_CAST_SHADOW = 1u << 3
 };
 
 // The light description. Always initialise with PS_LightDescInit() - it is the
@@ -280,7 +287,7 @@ typedef int (__cdecl *PS_IsUsingReversedDepthBuffer_t)(void);
 // Directional (sun/moon) shadows specifically.
 typedef int (__cdecl *PS_IsUsingGlobalShadows_t)(void);
 
-// True if ANY shadow system is on: global shadows, skylight, or headlights.
+// True if ANY shadow system is on: global shadows, skylight, or local shadows.
 typedef int (__cdecl *PS_IsUsingAnyShadows_t)(void);
 
 // Which pipeline replaced the game's own, per object class. 0 always means the
@@ -313,7 +320,7 @@ typedef int (__cdecl *PS_IsRenderingPostFX_t)(void);
 
 // The re-render passes, each 1 only while that capture is being built.
 typedef int (__cdecl *PS_IsCapturingGlobalShadows_t)(void);   // sun/moon shadow map
-typedef int (__cdecl *PS_IsCapturingLocalShadows_t)(void);    // headlight shadow map
+typedef int (__cdecl *PS_IsCapturingLocalShadows_t)(void);    // local shadow atlas
 typedef int (__cdecl *PS_IsCapturingSkylight_t)(void);
 typedef int (__cdecl *PS_IsCapturingReflections_t)(void);
 

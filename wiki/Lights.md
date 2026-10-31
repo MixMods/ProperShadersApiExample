@@ -102,6 +102,7 @@ and `PS_LightCreate` then returns `PS_INVALID_LIGHT`.
 | `PS_LIGHTFLAG_DISABLED` | The light stays registered but stops rendering. Cheaper than destroy/create for something that blinks or is toggled. See also `PS_LightSetEnabled`. |
 | `PS_LIGHTFLAG_NO_SURFACE_LIGHTING` | Skip the deferred pass: the light no longer illuminates geometry, but still feeds fog and beams. For something meant to read as a glow in the air rather than as a lamp lighting the street. |
 | `PS_LIGHTFLAG_IGNORE_AREA_TWEAKS` | Ignore the per-area light tweaks the map config applies. Proper Shaders dims or brightens lights in specific parts of the map to keep the vanilla map looking right; set this flag for lights that must keep exactly the intensity you asked for, such as a flashlight the player carries or a scripted cutscene light. |
+| `PS_LIGHTFLAG_CAST_SHADOW` | Ask for a real shadow: what stands in the light blocks it. The nearest lights that ask get one, as many as the user gave room for in `[LocalShadows]`, so a light far from the camera may go without. A point light takes six times the room of a spot light, so keep it to lights that need it, and prefer a spot. Ignored unless the user has local shadows enabled. API version 3. |
 
 ### Placement and shape
 
