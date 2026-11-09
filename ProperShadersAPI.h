@@ -52,7 +52,13 @@ extern "C" {
 // to find out what the INSTALLED ProperShaders supports; a runtime version
 // lower than the one you built against means the newer entry points are
 // missing and PS_ApiLoad() will have left them null.
-#define PS_API_VERSION 3
+#define PS_API_VERSION 4
+
+// History:
+//   1  lights (PS_LightCreate ...)
+//   2  state queries (PS_GetVersion, PS_IsUsing*, buffers ...)
+//   3  PS_LIGHTFLAG_CAST_SHADOW
+//   4  PS_SetVehicleLightsEnabled / PS_GetVehicleLightsEnabled
 
 //-----------------------------------------------------------------------------
 // Types
@@ -241,6 +247,18 @@ typedef int (__cdecl *PS_LightExists_t)(PS_LightHandle light);
 typedef int (__cdecl *PS_LightGetCount_t)(void);
 typedef int (__cdecl *PS_LightGetCapacity_t)(void);
 
+// Switches off (0) or back on (1) every light Proper Shaders adds for
+// vehicles: headlights, taillights, brake lights and the lights in the vehicle
+// models' 2dfx, together with their volumetric beams and local shadows. For a
+// mod that draws vehicle lights its own way - it can recreate them with
+// PS_LightCreate. The game's own coronas and light sprites are not affected.
+//
+// On by default. A single switch shared by every mod, not a counter: the last
+// call wins. Takes effect from the next frame and survives a settings reload.
+// Call it from the game thread. Requires API version 4.
+typedef void (__cdecl *PS_SetVehicleLightsEnabled_t)(int enabled);
+typedef int  (__cdecl *PS_GetVehicleLightsEnabled_t)(void);
+
 //-----------------------------------------------------------------------------
 // State queries
 //
@@ -264,12 +282,10 @@ typedef int (__cdecl *PS_GetVersion_t)(void);
 // then the render state and the buffers below are not meaningful yet.
 typedef int (__cdecl *PS_IsInitialized_t)(void);
 
-// Re-reads the ini files, the same thing the PSRLD cheat does.
-//
-// EXPERIMENTAL - reloading is not fully supported yet: it re-runs feature
-// configuration mid-frame and not every feature rebuilds its device resources
-// cleanly from there. Fine for tweaking during development, not something to
-// call in a shipped mod.
+// Re-reads the ini files, the same thing the PSRLD cheat does: every feature is
+// taken down and built again from the files, at the top of the next frame. It
+// costs a hitch and restarts the temporal effects' histories, so it is for
+// tuning, not for calling every frame.
 typedef void (__cdecl *PS_ReloadSettings_t)(void);
 
 // ---- Which features the user has enabled ----
@@ -390,6 +406,10 @@ typedef struct PS_Api
     PS_LightGetCount_t      LightGetCount;
     PS_LightGetCapacity_t   LightGetCapacity;
 
+    // Vehicle lights switch (API version 4 and up)
+    PS_SetVehicleLightsEnabled_t SetVehicleLightsEnabled;
+    PS_GetVehicleLightsEnabled_t GetVehicleLightsEnabled;
+
     // State queries (API version 2 and up)
     PS_GetVersion_t                 GetVersion;
     PS_IsInitialized_t              IsInitialized;
@@ -494,6 +514,9 @@ static __inline int PS_ApiLoad(PS_Api* api)
     api->LightExists       = (PS_LightExists_t)      GetProcAddress(module, "PS_LightExists");
     api->LightGetCount     = (PS_LightGetCount_t)    GetProcAddress(module, "PS_LightGetCount");
     api->LightGetCapacity  = (PS_LightGetCapacity_t) GetProcAddress(module, "PS_LightGetCapacity");
+
+    api->SetVehicleLightsEnabled = (PS_SetVehicleLightsEnabled_t)GetProcAddress(module, "PS_SetVehicleLightsEnabled");
+    api->GetVehicleLightsEnabled = (PS_GetVehicleLightsEnabled_t)GetProcAddress(module, "PS_GetVehicleLightsEnabled");
 
     api->GetVersion                 = (PS_GetVersion_t)                 GetProcAddress(module, "PS_GetVersion");
     api->IsInitialized              = (PS_IsInitialized_t)              GetProcAddress(module, "PS_IsInitialized");
